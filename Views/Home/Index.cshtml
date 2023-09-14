@@ -3,11 +3,122 @@
 *@
 @{
 }
+@using testirovanie.Models
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8"/>
     <title>Тестовый стенд</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style type="text/css">
+        table, th, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+            width: auto;
+            text-align: center;
+        }
+        .headers{
+            background-color: #aaa;
+        }
+        .container{
+            width: 300px;
+            margin: auto;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $("#command_id").change(function () {
+                $.ajax({
+                    url: "/Home/GetCommand/"+$("#command_id").val(),
+                    type: "GET",
+                    success: function (response) {
+                        if (response["parameter_name1"] != null) {
+                            $("#parametr1").show();
+                            $("#parametr1").children("label").text(response["parameter_name1"] + ":");
+                            $("#parametr1_value").val(response["parameter_default_value1"]);
+                        }
+                        else{
+                            $("p#parametr1").hide();
+                            $("#parametr1_value").val(0);
+                        }
+                        if (response["parameter_name2"] != null) {
+                            $("#parametr2").show();
+                            $("#parametr2").children("label").text(response["parameter_name2"] + ":");
+                            $("#parametr2_value").val(response["parameter_default_value2"]);
+                        }
+                        else {
+                            $("p#parametr2").hide();
+                            $("#parametr2_value").val(0);
+                        }
+                        if (response["parameter_name3"] != null) {
+                            $("#parametr3").show();
+                            $("#parametr3").children("label").text(response["parameter_name3"] + ":");
+                            $("#parametr3_value").val(response["parameter_default_value3"]);
+                        }
+                        else {
+                            $("p#parametr3").hide();
+                            $("#parametr3_value").val(0);
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
 </head>
 <body>
-    <h2>Начало...</h2>
+    <div class="container">
+        <form method="POST">
+            <p>
+                <lablel>ID терминала: </lablel>
+                <input name="id" id="id" type="number" maxlength=4 value=@ViewData["id"] />
+            </p>
+            <p>
+                <label>Список комманд: </label>
+                <select id="command_id" name="command_id">
+                    @foreach (var c in ViewBag.Commands)
+                    {
+                        <option value=@c.command_id>@c.name</option>
+                    }
+                </select>
+            </p> 
+            <p id="parametr1" hidden>
+                <label></label>
+                <input type="number" id="parametr1_value" name="parametr1_value" value=0 />
+            </p>
+            <p id="parametr2" hidden>
+                <label></label>
+                <input type="number" id="parametr2_value" name="parametr2_value" value=0 />
+            </p>
+            <p id="parametr3" hidden>
+                <label></label>
+                <input type="number" id="parametr3_value" name="parametr3_value" value=0 />
+            </p>
+            <input type="submit" id="btn_submit" value="Отправить" />
+        </form>
+    </div>
+    <br />
+    <table>
+        <thead>
+            <tr class="headers">
+                <th>Дата</th>
+                <th>Команда</th>
+                <th>Параметр 1</th>
+                <th>Параметр 2</th>
+                <th>Параметр 3</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        @foreach(var e in ViewBag.Events)
+        {
+            <tr>
+                <td>@e.date.ToString()</td>
+                <td>@e.commandName</td>
+                <td>@e.Val1</td>
+                <td>@e.Val2</td>
+                <td>@e.Val3</td>
+                <td>@e.Status</td>
+            </tr>
+        }
+    </table>
 </body>
